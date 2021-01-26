@@ -9,6 +9,23 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from albumy.extensions import db, whooshee
 
 
+# sqlalchemy模型转为dict混入类
+class ModelMixin(object):
+
+    def to_dict(self, excludes: tuple = None, selects: tuple = None) -> dict:
+        if not isinstance(self, db.Model):
+            raise TypeError('<%r> is not a sqlalchemy object' % self)
+        elif selects:
+            return {f: getattr(self, f) for f in selects}
+        elif excludes:
+            dict =  {f: getattr(self, f) for f in self.__dict__ if f not in excludes}
+        else:
+            dict = self.__dict__
+        if "_sa_instance_state" in dict:
+            del dict["_sa_instance_state"]
+        return dict
+
+
 roles_permissions = db.Table('roles_permissions',
                              db.Column('role_id', db.Integer, db.ForeignKey('role.id')),
                              db.Column('permission_id', db.Integer, db.ForeignKey('permission.id'))
@@ -60,8 +77,8 @@ class Follow(db.Model):
     followed = db.relationship('User', foreign_keys=[followed_id], back_populates='followers', lazy='joined')
 
 
-@whooshee.register_model('name', 'username')
-class User(db.Model, UserMixin):
+# @whooshee.register_model('name', 'username')
+class User(db.Model, UserMixin, ModelMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, index=True)
     email = db.Column(db.String(254), unique=True, index=True)
@@ -98,6 +115,9 @@ class User(db.Model, UserMixin):
                                 lazy='dynamic', cascade='all')
 
     notifications = db.relationship('Notification', back_populates='receiver', cascade='all')
+
+    token = db.Column(db.String(30), nullable=True)
+    expire_time = db.Column(db.String(255), nullable=True)
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)

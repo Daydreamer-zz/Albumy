@@ -42,6 +42,7 @@ def register_extensions(app):
     dropzone.init_app(app)
     avatars.init_app(app)
     csrf.init_app(app)
+    csrf.exempt(api_bp)
     whooshee.init_app(app)
 
 

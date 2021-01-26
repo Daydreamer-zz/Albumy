@@ -4,7 +4,7 @@ import os, uuid
 from urllib.parse import urlparse, urljoin
 import PIL
 from PIL import Image
-from flask import request, url_for, redirect, flash, current_app
+from flask import request, url_for, redirect, flash, current_app, jsonify
 from itsdangerous import BadSignature, SignatureExpired
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from albumy.extensions import db
@@ -85,3 +85,16 @@ def resize_image(image, filename, base_width):
     filename += current_app.config['ALBUMY_PHOTO_SUFFIX'][base_width] + ext  # 裁剪后的图片加_s或_m后缀
     img.save(os.path.join(current_app.config['ALBUMY_UPLOAD_PATH'], filename), optimize=True, quality=85)
     return filename
+
+
+class AttrDict(dict):
+    def __init__(self, *args, **kwargs):
+        super(AttrDict, self).__init__(*args, **kwargs)
+        self.__dict__ = self
+
+
+def json_response(data='', error=''):
+    content = AttrDict(data=data, error=error)
+    if error:
+        content.data = ''
+    return jsonify(content.data)
