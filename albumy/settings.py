@@ -56,8 +56,8 @@ class BaseConfig:
 
 class DevelopmentConfig(BaseConfig):
     SERVER_NAME = '127.0.0.1:8080'
-    # SQLALCHEMY_DATABASE_URI = prefix + os.path.join(basedir, 'data-dev.db')
-    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:199747@127.0.0.1:3306/albumy?charset=utf8"
+    SQLALCHEMY_DATABASE_URI = prefix + os.path.join(basedir, 'data-dev.db')
+    # SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:199747@127.0.0.1:3306/albumy?charset=utf8"
     REDIS_URL = "redis://localhost"
 
 
