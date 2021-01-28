@@ -97,4 +97,4 @@ def json_response(data='', error=''):
     content = AttrDict(data=data, error=error)
     if error:
         content.data = ''
-    return jsonify(content.data)
+    return jsonify(content)
